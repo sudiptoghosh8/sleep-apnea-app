@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+   "name": "frontend",
+  "homepage": "https://sudiptoghosh8.github.io/sleep-apnea-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,6 +10,11 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "scripts": {
+  // ... other scripts like "dev", "build"
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+},
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.10",
@@ -75,8 +81,3 @@
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af"
 }
 
-{
-  "name": "frontend",
-  "homepage": "https://sudiptoghosh8.github.io/sleep-apnea-app",
-  // ... rest of the file
-}
