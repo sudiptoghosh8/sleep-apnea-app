@@ -338,6 +338,6 @@ For support, please contact the development team or create an issue in the proje
 
 **Version**: 1.0.0  
 **Last Updated**: July 2025  
-**Developed by**: Manus AI Team
+**Developed by**: Sudipto Ghosh, Lecturer, Department of CSE, BUBT
 
 # sleep-apnea-app
