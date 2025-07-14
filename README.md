@@ -338,6 +338,10 @@ For support, please contact the development team or create an issue in the proje
 
 **Version**: 1.0.0  
 **Last Updated**: July 2025  
+<<<<<<< HEAD
 **Developed by**: Sudipto Ghosh, Lecturer, Department of CSE, BUBT
+=======
+**Developed by**: Sudipto Ghosh, Lecturer, Dept of CSE
+>>>>>>> ad76b3f91bf90f65dabea2e204af7f251cbf7a3d
 
 # sleep-apnea-app
