@@ -13,8 +13,8 @@ app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'sta
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
 
-# Enable CORS for all routes
-CORS(app, origins="*")
+# Enable CORS for all routes explicitly
+CORS(app, origins='*')
 
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(ecg_bp, url_prefix='/api/ecg')
@@ -44,19 +44,4 @@ def serve(path):
 
 
 if __name__ == '__main__':
-   # app.run(host='0.0.0.0', port=5002, debug=True)
-   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
-
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Hello, Render!"
-
-# if __name__ == "__main__":
-#     # Bind to all available IP addresses and the correct port.
-#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host='0.0.0.0', port=5000, debug=True)
