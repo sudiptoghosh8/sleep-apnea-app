@@ -44,4 +44,19 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002, debug=True)
+   # app.run(host='0.0.0.0', port=5002, debug=True)
+   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello, Render!"
+
+# if __name__ == "__main__":
+#     # Bind to all available IP addresses and the correct port.
+#     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
