@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: sleep-apnea-backend
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT src.main:app"
+    rootDir: backend # <--- CRUCIAL CHANGE: Point to your 'backend' directory
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.x # Or your specific Python version, e.g., 3.11.x
+      - key: FLASK_APP
+        value: src.main
+      - key: FLASK_ENV
+        value: production
