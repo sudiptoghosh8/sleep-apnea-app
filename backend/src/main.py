@@ -18,6 +18,7 @@ CORS(app, origins='*')
 CORS(app, resources={r"/api/*": {"origins": "https://sleep-apnea-app-ipc1.vercel.app"}})
 
 
+
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(ecg_bp, url_prefix='/api/ecg')
 
