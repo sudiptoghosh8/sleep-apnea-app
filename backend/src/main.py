@@ -15,6 +15,8 @@ app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
 
 # Enable CORS for all routes explicitly
 CORS(app, origins='*')
+CORS(app, resources={r"/api/*": {"origins": "https://your-frontend-url.vercel.app"}})
+
 
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(ecg_bp, url_prefix='/api/ecg')
