@@ -131,8 +131,6 @@ function App() {
     body: formData,
      })
 
-      
-
       clearInterval(progressInterval)
       setUploadProgress(100)
 
