@@ -267,6 +267,8 @@ def detect_sleep_apnea(ecg_data, sensitivity=0.5):
     except Exception as e:
         raise ValueError(f"Error in sleep apnea detection: {str(e)}")
 
+
+
 @ecg_bp.route('/upload', methods=['POST'])
 def upload_file():
     """Handle ECG file upload and processing"""
@@ -389,7 +391,6 @@ def health_check():
         'supported_formats': list(ALLOWED_EXTENSIONS),
         'max_file_size_mb': MAX_FILE_SIZE // (1024 * 1024)
     }), 200
-
 
 
 
