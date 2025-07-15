@@ -126,7 +126,7 @@ function App() {
       formData.append('file', file)
       formData.append('sensitivity', sensitivity.toString())
 
-      const response = await fetch('https://sleep-apnea-app.onrender.com/api/ecg/upload', {
+      const response = await fetch('https://sleep-apnea-app.onrender.com/api/ecg/demo', {
         method: 'POST',
         body: formData,
       })
