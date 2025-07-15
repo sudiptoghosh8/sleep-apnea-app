@@ -10,12 +10,24 @@ import tempfile
 import io
 from datetime import datetime
 import random
+import lightgbm as lgb
 
 ecg_bp = Blueprint('ecg', __name__)
 
 # Configuration
 ALLOWED_EXTENSIONS = {'csv', 'txt', 'json', 'apn'}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+
+# Placeholder for the LightGBM model
+# In a real application, you would load a trained model here.
+# For demonstration, we'll simulate a model loading and prediction.
+# model_path = os.path.join(os.path.dirname(__file__), 'lgbm_model.txt') # Assuming model is saved as text
+# try:
+#     with open(model_path, 'r') as f:
+#         lgbm_model = lgb.Booster(model_str=f.read())
+# except Exception as e:
+#     current_app.logger.warning(f'Error loading LightGBM model: {e}. Using simulated detection.')
+#     lgbm_model = None
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -150,53 +162,71 @@ def parse_apn_file(file_content):
 
 def detect_sleep_apnea(ecg_data, sensitivity=0.5):
     """
-    Simulated sleep apnea detection algorithm
+    Detect sleep apnea using a LightGBM model (simulated for now)
     Returns analysis results with apnea events and statistics
     """
     try:
         if len(ecg_data) == 0:
             return None
             
-        # Simulate realistic sleep apnea detection
-        sampling_rate = 250  # Assume 250 Hz sampling rate
-        duration_hours = len(ecg_data) / (sampling_rate * 3600)
+        # In a real scenario, you would preprocess ecg_data to create features
+        # that your LightGBM model expects. For this simulation, we'll create
+        # dummy features.
         
-        # Simulate apnea detection based on ECG variability
-        # Real algorithms would analyze heart rate variability, R-R intervals, etc.
+        # Example: Create simple features (mean, std, min, max of segments)
+        # This is a very basic example and would need to be much more sophisticated
+        # for a real-world sleep apnea detection.
+        segment_length = 250 # 1 second segments if sampling rate is 250 Hz
+        features = []
+        for i in range(0, len(ecg_data), segment_length):
+            segment = ecg_data[i:i + segment_length]
+            if len(segment) == segment_length:
+                features.append([
+                    np.mean(segment),
+                    np.std(segment),
+                    np.min(segment),
+                    np.max(segment)
+                ])
         
-        # Calculate basic statistics
-        mean_signal = np.mean(ecg_data)
-        std_signal = np.std(ecg_data)
-        
-        # Simulate apnea events based on signal characteristics and sensitivity
-        base_apnea_rate = 5 + (1 - sensitivity) * 15  # 5-20 events per hour based on sensitivity
-        expected_events = int(duration_hours * base_apnea_rate)
-        
-        # Add some randomness based on signal characteristics
-        signal_variability = std_signal / (abs(mean_signal) + 1e-6)
-        variability_factor = min(2.0, max(0.5, signal_variability))
-        actual_events = max(0, int(expected_events * variability_factor * (0.8 + 0.4 * random.random())))
-        
-        # Generate apnea event timestamps
-        apnea_events = []
-        if actual_events > 0:
-            event_indices = sorted(random.sample(range(len(ecg_data)), min(actual_events * 10, len(ecg_data) // 100)))
+        if not features:
+            return None
             
-            for i in range(0, len(event_indices), 10):  # Group events
-                start_idx = event_indices[i]
-                duration = random.randint(10, 60)  # 10-60 seconds
-                end_idx = min(start_idx + duration * sampling_rate, len(ecg_data) - 1)
+        feature_df = pd.DataFrame(features, columns=['mean', 'std', 'min', 'max'])
+        
+        # Simulate LightGBM prediction
+        # In a real scenario, you would use: lgbm_model.predict(feature_df)
+        # For now, we'll generate random probabilities based on sensitivity
+        
+        # Generate random probabilities for each segment
+        simulated_probabilities = np.random.rand(len(feature_df)) * (1 - sensitivity) + (sensitivity * 0.5)
+        
+        # Determine apnea events based on a threshold
+        apnea_threshold = 0.5 # This would be learned by the model
+        apnea_predictions = (simulated_probabilities > apnea_threshold).astype(int)
+        
+        # Convert segment-level predictions back to original ECG data scale for visualization
+        # This is a simplified mapping for demonstration
+        apnea_events = []
+        for i, prediction in enumerate(apnea_predictions):
+            if prediction == 1:
+                start_idx = i * segment_length
+                end_idx = min((i + 1) * segment_length, len(ecg_data) - 1)
+                duration = (end_idx - start_idx) / 250 # Assuming 250 Hz
                 
+                # Simulate severity
+                severity = random.choice(['mild', 'moderate', 'severe'])
                 apnea_events.append({
-                    'start_time': start_idx / sampling_rate,
-                    'end_time': end_idx / sampling_rate,
-                    'duration': (end_idx - start_idx) / sampling_rate,
+                    'start_time': start_idx / 250,
+                    'end_time': end_idx / 250,
+                    'duration': duration,
                     'start_index': int(start_idx),
                     'end_index': int(end_idx),
-                    'severity': random.choice(['mild', 'moderate', 'severe'])
+                    'severity': severity
                 })
         
         # Calculate AHI (Apnea-Hypopnea Index)
+        sampling_rate = 250
+        duration_hours = len(ecg_data) / (sampling_rate * 3600)
         ahi = len(apnea_events) / max(duration_hours, 0.1)
         
         # Determine severity based on AHI
@@ -211,24 +241,11 @@ def detect_sleep_apnea(ecg_data, sensitivity=0.5):
         
         # Generate probability data for visualization
         prob_data = []
-        window_size = max(1, len(ecg_data) // 1000)  # Reduce data points for visualization
-        
-        for i in range(0, len(ecg_data), window_size):
-            time_point = i / sampling_rate
-            
-            # Calculate probability based on proximity to apnea events
-            prob = 0.1  # Base probability
-            for event in apnea_events:
-                if event['start_time'] <= time_point <= event['end_time']:
-                    prob = 0.8 + 0.2 * random.random()
-                    break
-                elif abs(time_point - event['start_time']) < 30:  # Within 30 seconds
-                    distance = abs(time_point - event['start_time'])
-                    prob = max(prob, 0.3 * (1 - distance / 30) + 0.1 * random.random())
-            
+        for i, prob in enumerate(simulated_probabilities):
+            time_point = (i * segment_length) / sampling_rate
             prob_data.append({
                 'time': time_point,
-                'probability': min(1.0, prob + 0.05 * random.random())
+                'probability': float(prob)
             })
         
         return {
@@ -239,8 +256,8 @@ def detect_sleep_apnea(ecg_data, sensitivity=0.5):
             'apnea_events': apnea_events[:50],  # Limit for frontend performance
             'probability_data': prob_data,
             'signal_stats': {
-                'mean': float(mean_signal),
-                'std': float(std_signal),
+                'mean': float(np.mean(ecg_data)),
+                'std': float(np.std(ecg_data)),
                 'min': float(np.min(ecg_data)),
                 'max': float(np.max(ecg_data)),
                 'length': len(ecg_data)
@@ -372,4 +389,8 @@ def health_check():
         'supported_formats': list(ALLOWED_EXTENSIONS),
         'max_file_size_mb': MAX_FILE_SIZE // (1024 * 1024)
     }), 200
+
+
+
+
 
