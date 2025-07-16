@@ -13,9 +13,11 @@ app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'sta
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
 
+
+port = int(os.environ.get('PORT', 5000))
 # Enable CORS for all routes explicitly
-CORS(app, origins='*')
-CORS(app, resources={r"/api/*": {"origins": "https://sleep-apnea-app-ipc1.vercel.app"}})
+#CORS(app, origins='*')
+CORS(app, resources={r"/api/*": {"origins": "https://sleep-apnea-app-ipc1.vercel.app/"}})
 
 
 
@@ -47,4 +49,4 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+   app.run(host='0.0.0.0', port=port, debug=True)
